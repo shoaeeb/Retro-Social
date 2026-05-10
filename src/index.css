@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=VT323&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-retro: "VT323", monospace;
+  
+  --color-retro-teal: #008080;
+  --color-retro-gray: #c0c0c0;
+  --color-retro-blue: #000080;
+  --color-retro-pink: #ff00ff;
+  --color-retro-yellow: #ffff00;
+}
+
+@layer base {
+  body {
+    @apply bg-retro-teal font-mono text-black antialiased;
+  }
+}
+
+@layer components {
+  .window-frame {
+    @apply bg-retro-gray border-2 border-t-white border-l-white border-b-gray-600 border-r-gray-600 shadow-[2px_2px_0px_rgba(0,0,0,1)];
+  }
+
+  .window-title {
+    @apply bg-retro-blue text-white flex items-center justify-between px-1 py-0.5 text-xs font-bold select-none;
+  }
+
+  .retro-button {
+    @apply bg-retro-gray border-2 border-t-white border-l-white border-b-gray-800 border-r-gray-800 px-4 py-1 flex items-center justify-center gap-2 active:border-t-gray-800 active:border-l-gray-800 active:border-b-white active:border-r-white active:translate-x-[1px] active:translate-y-[1px];
+  }
+
+  .retro-input {
+    @apply bg-white border-2 border-t-gray-800 border-l-gray-800 border-b-white border-r-white px-2 py-1 outline-none text-sm focus:ring-1 focus:ring-retro-blue;
+  }
+}
+
+.crt-overlay::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 100;
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+}
+
