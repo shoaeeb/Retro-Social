@@ -11,6 +11,7 @@ import {
   LogIn, 
   ChevronRight
 } from 'lucide-react';
+import { apiUrl } from '../api';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -28,7 +29,7 @@ export default function AuthPage() {
     setIsLoading(true);
     setError(null);
 
-    const url = isLogin ? '/api/auth/login' : '/api/auth/signup';
+    const url = isLogin ? apiUrl('/api/auth/login') : apiUrl('/api/auth/signup');
     const body = isLogin ? { email, password } : { name, email, password };
 
     try {
