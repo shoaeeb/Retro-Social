@@ -2,7 +2,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
-import { apiUrl } from '../api';
 import { 
   X, 
   Minus, 
@@ -49,7 +48,7 @@ export default function HomePage() {
     }
 
     // Verify token and get user
-    fetch(apiUrl('/api/users/me', {
+    fetch('/api/users/me', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -72,26 +71,26 @@ export default function HomePage() {
   }, [navigate]);
 
   const fetchFeaturedUser = () => {
-    fetch(apiUrl('/api/users/featured', {
+    fetch('/api/users/featured', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     }).then(res => res.json()).then(data => setFeaturedUser(data)).catch(console.error);
   };
 
   const fetchFriends = () => {
-    fetch(apiUrl('/api/users/me/friends', {
+    fetch('/api/users/me/friends', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     }).then(res => res.json()).then(data => setUser(prev => prev ? {...prev, friends: data} : null)).catch(console.error);
   };
 
   const fetchRequests = () => {
-    fetch(apiUrl('/api/friends/requests', {
+    fetch('/api/friends/requests', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     }).then(res => res.json()).then(data => setFriendRequests(data)).catch(console.error);
   };
 
   const handleRequestAction = async (requestId: string, action: 'accept' | 'deny') => {
     try {
-      await fetch(apiUrl(`/api/friends/handle/${requestId}`), {
+      await fetch(`/api/friends/handle/${requestId}`, {
         method: 'PUT',
         headers: {
            'Content-Type': 'application/json',
@@ -108,7 +107,7 @@ export default function HomePage() {
 
   const sendRequest = async (toUserId: string) => {
     try {
-      const res = await fetch(apiUrl(`/api/friends/request/${toUserId}`), {
+      const res = await fetch(`/api/friends/request/${toUserId}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
       });
@@ -323,7 +322,7 @@ function BlogView({ targetUserId, currentUser }: { targetUserId: string | null, 
 
   const fetchBlogs = () => {
     const token = localStorage.getItem('retro_token');
-    fetch(apiUrl(`/api/blogs/${userId}?t=${Date.now()}`), {
+    fetch(`/api/blogs/${userId}?t=${Date.now()}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(res => res.json())
@@ -336,7 +335,7 @@ function BlogView({ targetUserId, currentUser }: { targetUserId: string | null, 
     if (!newTitle.trim() || !newContent.trim()) return;
     
     const token = localStorage.getItem('retro_token');
-    fetch(apiUrl('/api/blogs', {
+    fetch('/api/blogs', {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${token}`,
@@ -422,7 +421,7 @@ function GuestbookView({ targetUserId, currentUser }: { targetUserId: string | n
 
   const fetchGuestbook = () => {
     const token = localStorage.getItem('retro_token');
-    fetch(apiUrl(`/api/guestbook/${userId}?t=${Date.now()}`), {
+    fetch(`/api/guestbook/${userId}?t=${Date.now()}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(res => res.json())
@@ -435,7 +434,7 @@ function GuestbookView({ targetUserId, currentUser }: { targetUserId: string | n
     if (!newContent.trim()) return;
     
     const token = localStorage.getItem('retro_token');
-    fetch(apiUrl(`/api/guestbook/${userId}`), {
+    fetch(`/api/guestbook/${userId}`, {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${token}`,
@@ -514,7 +513,7 @@ function EventsView({ targetUserId, currentUser }: { targetUserId: string | null
 
   const fetchEvents = () => {
     const token = localStorage.getItem('retro_token');
-    fetch(apiUrl(`/api/events/${userId}?t=${Date.now()}`), {
+    fetch(`/api/events/${userId}?t=${Date.now()}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(res => res.json())
@@ -527,7 +526,7 @@ function EventsView({ targetUserId, currentUser }: { targetUserId: string | null
     if (!newTitle.trim() || !newDate.trim()) return;
     
     const token = localStorage.getItem('retro_token');
-    fetch(apiUrl(`/api/events/${userId}`), {
+    fetch(`/api/events/${userId}`, {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${token}`,
@@ -631,7 +630,7 @@ function FeedView({ user, onViewProfile }: { user: UserData, onViewProfile: (id:
   }, []);
 
   const fetchPosts = () => {
-    fetch(apiUrl('/api/posts', {
+    fetch('/api/posts', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     })
     .then(res => res.json())
@@ -645,7 +644,7 @@ function FeedView({ user, onViewProfile }: { user: UserData, onViewProfile: (id:
     setIsPosting(true);
     
     try {
-      const res = await fetch(apiUrl('/api/posts', {
+      const res = await fetch('/api/posts', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -751,7 +750,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
   const displayUser = profileUser || user;
 
   const fetchGuestbook = (userId: string) => {
-    fetch(apiUrl(`/api/guestbook/${userId}?t=${Date.now()}`), {
+    fetch(`/api/guestbook/${userId}?t=${Date.now()}`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     })
     .then(res => res.json())
@@ -761,7 +760,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
 
   useEffect(() => {
     if (targetUserId && targetUserId !== user._id) {
-      fetch(apiUrl(`/api/users/${targetUserId}`), { headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }})
+      fetch(`/api/users/${targetUserId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }})
       .then(res => res.json())
       .then(data => {
          setProfileUser(data);
@@ -778,7 +777,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
 
   useEffect(() => {
     if (isMe) {
-      fetch(apiUrl('/api/users/me/hit', {
+      fetch('/api/users/me/hit', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
       })
@@ -794,7 +793,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
     e.preventDefault();
     if (!newComment.trim()) return;
     
-    fetch(apiUrl(`/api/guestbook/${displayUser._id}`), {
+    fetch(`/api/guestbook/${displayUser._id}`, {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${localStorage.getItem('retro_token')}`,
@@ -820,7 +819,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(apiUrl('/api/users/me', {
+      const res = await fetch('/api/users/me', {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -1119,7 +1118,7 @@ function MessagesView({ currentUser }: { currentUser: UserData }) {
     if (!token) return;
 
     // determine transport and URL
-    const newSocket = io(import.meta.env.VITE_API_URL ?? '', {
+    const newSocket = io({
       transports: ['websocket', 'polling']
     });
 
@@ -1144,7 +1143,7 @@ function MessagesView({ currentUser }: { currentUser: UserData }) {
     setSocket(newSocket);
 
     // 2. Fetch Friends
-    fetch(apiUrl('/api/users/me/friends', {
+    fetch('/api/users/me/friends', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -1160,7 +1159,7 @@ function MessagesView({ currentUser }: { currentUser: UserData }) {
     // Re-fetch messages when selected friend changes
     if (selectedFriend) {
       const token = localStorage.getItem('retro_token');
-      fetch(apiUrl(`/api/messages/${selectedFriend._id}`), {
+      fetch(`/api/messages/${selectedFriend._id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.json())
@@ -1259,7 +1258,7 @@ function SearchView({ user, onViewProfile, onAddFriend }: { user: UserData, onVi
     setHasSearched(true);
     
     try {
-      const res = await fetch(apiUrl(`/api/users/search?keyword=${encodeURIComponent(keywords)}&type=${searchBy}`), {
+      const res = await fetch(`/api/users/search?keyword=${encodeURIComponent(keywords)}&type=${searchBy}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
       });
       if (res.ok) {
@@ -1413,5 +1412,3 @@ function SearchView({ user, onViewProfile, onAddFriend }: { user: UserData, onVi
     </div>
   );
 }
-
-
