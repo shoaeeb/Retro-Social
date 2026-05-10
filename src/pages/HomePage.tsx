@@ -49,7 +49,7 @@ export default function HomePage() {
     }
 
     // Verify token and get user
-    fetch(\piUrl('/api/users/me', {
+    fetch(apiUrl('/api/users/me', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -72,19 +72,19 @@ export default function HomePage() {
   }, [navigate]);
 
   const fetchFeaturedUser = () => {
-    fetch(\piUrl('/api/users/featured', {
+    fetch(apiUrl('/api/users/featured', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     }).then(res => res.json()).then(data => setFeaturedUser(data)).catch(console.error);
   };
 
   const fetchFriends = () => {
-    fetch(\piUrl('/api/users/me/friends', {
+    fetch(apiUrl('/api/users/me/friends', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     }).then(res => res.json()).then(data => setUser(prev => prev ? {...prev, friends: data} : null)).catch(console.error);
   };
 
   const fetchRequests = () => {
-    fetch(\piUrl('/api/friends/requests', {
+    fetch(apiUrl('/api/friends/requests', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     }).then(res => res.json()).then(data => setFriendRequests(data)).catch(console.error);
   };
@@ -336,7 +336,7 @@ function BlogView({ targetUserId, currentUser }: { targetUserId: string | null, 
     if (!newTitle.trim() || !newContent.trim()) return;
     
     const token = localStorage.getItem('retro_token');
-    fetch(\piUrl('/api/blogs', {
+    fetch(apiUrl('/api/blogs', {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${token}`,
@@ -631,7 +631,7 @@ function FeedView({ user, onViewProfile }: { user: UserData, onViewProfile: (id:
   }, []);
 
   const fetchPosts = () => {
-    fetch(\piUrl('/api/posts', {
+    fetch(apiUrl('/api/posts', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     })
     .then(res => res.json())
@@ -645,7 +645,7 @@ function FeedView({ user, onViewProfile }: { user: UserData, onViewProfile: (id:
     setIsPosting(true);
     
     try {
-      const res = await fetch(\piUrl('/api/posts', {
+      const res = await fetch(apiUrl('/api/posts', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -778,7 +778,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
 
   useEffect(() => {
     if (isMe) {
-      fetch(\piUrl('/api/users/me/hit', {
+      fetch(apiUrl('/api/users/me/hit', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
       })
@@ -820,7 +820,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(\piUrl('/api/users/me', {
+      const res = await fetch(apiUrl('/api/users/me', {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -1144,7 +1144,7 @@ function MessagesView({ currentUser }: { currentUser: UserData }) {
     setSocket(newSocket);
 
     // 2. Fetch Friends
-    fetch(\piUrl('/api/users/me/friends', {
+    fetch(apiUrl('/api/users/me/friends', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
