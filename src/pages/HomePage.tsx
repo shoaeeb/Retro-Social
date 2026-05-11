@@ -86,8 +86,16 @@ export default function HomePage() {
   const fetchRequests = () => {
     fetch(apiUrl('/api/friends/requests'), {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
-    }).then(res => res.json()).then(data => setFriendRequests(data)).catch(console.error);
+    }).then(res => res.json()).then(data => {
+      if (data.incoming) setFriendRequests(data);
+    }).catch(console.error);
   };
+
+  // Poll for new friend requests every 15 seconds
+  useEffect(() => {
+    const interval = setInterval(fetchRequests, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleRequestAction = async (requestId: string, action: 'accept' | 'deny') => {
     try {
