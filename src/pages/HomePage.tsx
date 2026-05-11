@@ -255,6 +255,7 @@ export default function HomePage() {
             </div>
 
             {/* Right Column */}
+            {activeTab !== 'profile' && (
             <div className="w-64 shrink-0 flex flex-col gap-4 overflow-y-auto">
               <div className="window-frame bg-retro-gray p-1 shadow-md">
                 <div className="bg-retro-blue text-white text-[10px] font-bold px-2 py-0.5">
@@ -302,6 +303,7 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+            )}
 
           </div>
           )}
