@@ -365,7 +365,7 @@ function BlogView({ targetUserId, currentUser }: { targetUserId: string | null, 
   };
 
   return (
-    <div className="bg-white border-2 border-t-gray-800 border-l-gray-800 h-full p-4 flex flex-col gap-4 overflow-y-auto">
+    <div className="bg-white border-2 border-t-gray-800 border-l-gray-800 min-h-0 flex-1 p-4 flex flex-col gap-4 overflow-y-auto">
       {isMe && !isWriting && (
         <button onClick={() => setIsWriting(true)} className="retro-button w-full">Write a New Blog Entry</button>
       )}
@@ -463,7 +463,7 @@ function GuestbookView({ targetUserId, currentUser }: { targetUserId: string | n
   };
 
   return (
-    <div className="bg-white border-2 border-t-gray-800 border-l-gray-800 h-full p-4 flex flex-col gap-4 overflow-y-auto w-full max-h-full">
+    <div className="bg-white border-2 border-t-gray-800 border-l-gray-800 min-h-0 flex-1 p-4 flex flex-col gap-4 overflow-y-auto w-full">
       {!isWriting ? (
         <button onClick={() => setIsWriting(true)} className="retro-button w-full">Sign Guestbook</button>
       ) : (
@@ -563,7 +563,7 @@ function EventsView({ targetUserId, currentUser }: { targetUserId: string | null
   };
 
   return (
-    <div className="bg-white border-2 border-t-gray-800 border-l-gray-800 h-full p-4 flex flex-col gap-4 overflow-y-auto w-full max-h-full">
+    <div className="bg-white border-2 border-t-gray-800 border-l-gray-800 min-h-0 flex-1 p-4 flex flex-col gap-4 overflow-y-auto w-full">
       {isMe && !isWriting && (
         <button onClick={() => setIsWriting(true)} className="retro-button w-full">Create a New Event</button>
       )}
