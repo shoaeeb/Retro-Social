@@ -2,6 +2,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
+import { apiUrl } from '../api';
 import { 
   X, 
   Minus, 
@@ -48,7 +49,7 @@ export default function HomePage() {
     }
 
     // Verify token and get user
-    fetch('/api/users/me', {
+    fetch(apiUrl('/api/users/me'), {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -71,26 +72,26 @@ export default function HomePage() {
   }, [navigate]);
 
   const fetchFeaturedUser = () => {
-    fetch('/api/users/featured', {
+    fetch(apiUrl('/api/users/featured'), {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     }).then(res => res.json()).then(data => setFeaturedUser(data)).catch(console.error);
   };
 
   const fetchFriends = () => {
-    fetch('/api/users/me/friends', {
+    fetch(apiUrl('/api/users/me/friends'), {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     }).then(res => res.json()).then(data => setUser(prev => prev ? {...prev, friends: data} : null)).catch(console.error);
   };
 
   const fetchRequests = () => {
-    fetch('/api/friends/requests', {
+    fetch(apiUrl('/api/friends/requests'), {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     }).then(res => res.json()).then(data => setFriendRequests(data)).catch(console.error);
   };
 
   const handleRequestAction = async (requestId: string, action: 'accept' | 'deny') => {
     try {
-      await fetch(`/api/friends/handle/${requestId}`, {
+      await fetch(apiUrl(`/api/friends/handle/${requestId}`), {
         method: 'PUT',
         headers: {
            'Content-Type': 'application/json',
@@ -107,7 +108,7 @@ export default function HomePage() {
 
   const sendRequest = async (toUserId: string) => {
     try {
-      const res = await fetch(`/api/friends/request/${toUserId}`, {
+      const res = await fetch(apiUrl(`/api/friends/request/${toUserId}`), {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
       });
@@ -134,12 +135,12 @@ export default function HomePage() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="w-full h-full overflow-y-auto pointer-events-auto flex justify-center bg-blue-900"
+        className="w-full h-screen overflow-hidden pointer-events-auto flex justify-center bg-blue-900"
         style={{
            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 3.333l1.83 5.631h5.922l-4.79 3.481 1.83 5.631L20 14.595l-4.792 3.481 1.83-5.631-4.79-3.48h5.922L20 3.333z' fill='%23fbbf24' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`,
         }}
       >
-        <div className="w-full max-w-5xl bg-transparent min-h-screen py-8">
+        <div className="w-full max-w-5xl bg-transparent h-full flex flex-col py-8 px-2">
           
           {/* Header */}
           <div className="flex items-end justify-between border-b-4 border-blue-600 pb-2 mb-4">
@@ -157,13 +158,15 @@ export default function HomePage() {
 
           {/* Main Content Area */}
           {activeTab === 'search' ? (
-            <SearchView user={user!} onViewProfile={(id) => { setViewingUserId(id); setActiveTab('profile'); }} onAddFriend={sendRequest} />
+            <div className="flex-1 overflow-y-auto">
+              <SearchView user={user!} onViewProfile={(id) => { setViewingUserId(id); setActiveTab('profile'); }} onAddFriend={sendRequest} />
+            </div>
           ) : (
-            <div className="flex gap-4">
+            <div className="flex gap-4 flex-1 min-h-0">
               
               {/* Left Column */}
             {activeTab !== 'profile' && (
-              <div className="w-64 shrink-0 flex flex-col gap-4">
+              <div className="w-64 shrink-0 flex flex-col gap-4 overflow-y-auto">
                 <div className="window-frame bg-retro-gray p-1 shadow-md">
                   <div className="bg-retro-blue text-white text-[10px] font-bold px-2 py-0.5">
                     Me
@@ -197,54 +200,54 @@ export default function HomePage() {
             )}
 
             {/* Middle Column (Feed / Profile) */}
-            <div className="flex-1 flex flex-col gap-4">
+            <div className="flex-1 flex flex-col gap-4 min-h-0 min-w-0">
               {activeTab === 'feed' && (
-                <div className="window-frame bg-retro-gray p-1 shadow-md h-full flex flex-col">
+                <div className="window-frame bg-retro-gray p-1 shadow-md flex-1 flex flex-col min-h-0">
                   <div className="bg-retro-blue text-white text-[10px] font-bold px-2 py-0.5">
                     Bulletin Board
                   </div>
-                  <div className="flex-1 bg-white border-2 border-t-gray-800 border-l-gray-800 p-2 overflow-y-auto">
+                  <div className="flex-1 bg-white border-2 border-t-gray-800 border-l-gray-800 p-2 overflow-y-auto min-h-0">
                     <FeedView user={user!} onViewProfile={(id) => { setViewingUserId(id); setActiveTab('profile'); }} />
                   </div>
                 </div>
               )}
               {activeTab === 'profile' && <ProfileView user={user!} targetUserId={viewingUserId} onUpdate={setUser} onAddFriend={sendRequest} onViewProfile={(id) => { setViewingUserId(id); setActiveTab('profile'); }} onViewBlog={(id) => { setViewingUserId(id); setActiveTab('blog'); }} onViewGuestbook={(id) => { setViewingUserId(id); setActiveTab('guestbook'); }} onViewEvents={(id) => { setViewingUserId(id); setActiveTab('events'); }} />}
               {activeTab === 'messages' && (
-                <div className="window-frame bg-retro-gray p-1 shadow-md h-full flex flex-col">
+                <div className="window-frame bg-retro-gray p-1 shadow-md flex-1 flex flex-col min-h-0">
                   <div className="bg-retro-blue text-white text-[10px] font-bold px-2 py-0.5">
                     Messages
                   </div>
-                  <div className="flex-1 overflow-hidden">
+                  <div className="flex-1 overflow-hidden min-h-0 flex flex-col">
                     <MessagesView currentUser={user!} />
                   </div>
                 </div>
               )}
               {activeTab === 'blog' && (
-                <div className="window-frame bg-retro-gray p-1 shadow-md h-full flex flex-col z-10 w-full relative">
+                <div className="window-frame bg-retro-gray p-1 shadow-md flex-1 flex flex-col min-h-0 z-10 w-full relative">
                   <div className="bg-retro-blue text-white text-[10px] font-bold px-2 py-0.5">
                     Blog Entries
                   </div>
-                  <div className="flex-1 overflow-y-auto">
+                  <div className="flex-1 overflow-y-auto min-h-0">
                     <BlogView targetUserId={viewingUserId} currentUser={user!} />
                   </div>
                 </div>
               )}
               {activeTab === 'guestbook' && (
-                <div className="window-frame bg-retro-gray p-1 shadow-md h-full flex flex-col z-10 w-full relative">
+                <div className="window-frame bg-retro-gray p-1 shadow-md flex-1 flex flex-col min-h-0 z-10 w-full relative">
                   <div className="bg-retro-blue text-white text-[10px] font-bold px-2 py-0.5">
                     Guestbook
                   </div>
-                  <div className="flex-1 overflow-y-auto">
+                  <div className="flex-1 overflow-y-auto min-h-0">
                     <GuestbookView targetUserId={viewingUserId} currentUser={user!} />
                   </div>
                 </div>
               )}
               {activeTab === 'events' && (
-                <div className="window-frame bg-retro-gray p-1 shadow-md h-full flex flex-col z-10 w-full relative">
+                <div className="window-frame bg-retro-gray p-1 shadow-md flex-1 flex flex-col min-h-0 z-10 w-full relative">
                   <div className="bg-retro-blue text-white text-[10px] font-bold px-2 py-0.5">
                     Events
                   </div>
-                  <div className="flex-1 overflow-y-auto">
+                  <div className="flex-1 overflow-y-auto min-h-0">
                     <EventsView targetUserId={viewingUserId} currentUser={user!} />
                   </div>
                 </div>
@@ -252,7 +255,7 @@ export default function HomePage() {
             </div>
 
             {/* Right Column */}
-            <div className="w-64 shrink-0 flex flex-col gap-4">
+            <div className="w-64 shrink-0 flex flex-col gap-4 overflow-y-auto">
               <div className="window-frame bg-retro-gray p-1 shadow-md">
                 <div className="bg-retro-blue text-white text-[10px] font-bold px-2 py-0.5">
                   Friend Requests
@@ -322,7 +325,7 @@ function BlogView({ targetUserId, currentUser }: { targetUserId: string | null, 
 
   const fetchBlogs = () => {
     const token = localStorage.getItem('retro_token');
-    fetch(`/api/blogs/${userId}?t=${Date.now()}`, {
+    fetch(apiUrl(`/api/blogs/${userId}?t=${Date.now()}`), {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(res => res.json())
@@ -335,7 +338,7 @@ function BlogView({ targetUserId, currentUser }: { targetUserId: string | null, 
     if (!newTitle.trim() || !newContent.trim()) return;
     
     const token = localStorage.getItem('retro_token');
-    fetch('/api/blogs', {
+    fetch(apiUrl('/api/blogs'), {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${token}`,
@@ -421,7 +424,7 @@ function GuestbookView({ targetUserId, currentUser }: { targetUserId: string | n
 
   const fetchGuestbook = () => {
     const token = localStorage.getItem('retro_token');
-    fetch(`/api/guestbook/${userId}?t=${Date.now()}`, {
+    fetch(apiUrl(`/api/guestbook/${userId}?t=${Date.now()}`), {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(res => res.json())
@@ -434,7 +437,7 @@ function GuestbookView({ targetUserId, currentUser }: { targetUserId: string | n
     if (!newContent.trim()) return;
     
     const token = localStorage.getItem('retro_token');
-    fetch(`/api/guestbook/${userId}`, {
+    fetch(apiUrl(`/api/guestbook/${userId}`), {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${token}`,
@@ -513,7 +516,7 @@ function EventsView({ targetUserId, currentUser }: { targetUserId: string | null
 
   const fetchEvents = () => {
     const token = localStorage.getItem('retro_token');
-    fetch(`/api/events/${userId}?t=${Date.now()}`, {
+    fetch(apiUrl(`/api/events/${userId}?t=${Date.now()}`), {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(res => res.json())
@@ -526,7 +529,7 @@ function EventsView({ targetUserId, currentUser }: { targetUserId: string | null
     if (!newTitle.trim() || !newDate.trim()) return;
     
     const token = localStorage.getItem('retro_token');
-    fetch(`/api/events/${userId}`, {
+    fetch(apiUrl(`/api/events/${userId}`), {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${token}`,
@@ -630,7 +633,7 @@ function FeedView({ user, onViewProfile }: { user: UserData, onViewProfile: (id:
   }, []);
 
   const fetchPosts = () => {
-    fetch('/api/posts', {
+    fetch(apiUrl('/api/posts'), {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     })
     .then(res => res.json())
@@ -644,7 +647,7 @@ function FeedView({ user, onViewProfile }: { user: UserData, onViewProfile: (id:
     setIsPosting(true);
     
     try {
-      const res = await fetch('/api/posts', {
+      const res = await fetch(apiUrl('/api/posts'), {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -750,7 +753,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
   const displayUser = profileUser || user;
 
   const fetchGuestbook = (userId: string) => {
-    fetch(`/api/guestbook/${userId}?t=${Date.now()}`, {
+    fetch(apiUrl(`/api/guestbook/${userId}?t=${Date.now()}`), {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     })
     .then(res => res.json())
@@ -760,7 +763,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
 
   useEffect(() => {
     if (targetUserId && targetUserId !== user._id) {
-      fetch(`/api/users/${targetUserId}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }})
+      fetch(apiUrl(`/api/users/${targetUserId}`), { headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }})
       .then(res => res.json())
       .then(data => {
          setProfileUser(data);
@@ -777,7 +780,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
 
   useEffect(() => {
     if (isMe) {
-      fetch('/api/users/me/hit', {
+      fetch(apiUrl('/api/users/me/hit'), {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
       })
@@ -793,7 +796,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
     e.preventDefault();
     if (!newComment.trim()) return;
     
-    fetch(`/api/guestbook/${displayUser._id}`, {
+    fetch(apiUrl(`/api/guestbook/${displayUser._id}`), {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${localStorage.getItem('retro_token')}`,
@@ -819,7 +822,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/users/me', {
+      const res = await fetch(apiUrl('/api/users/me'), {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -1118,7 +1121,7 @@ function MessagesView({ currentUser }: { currentUser: UserData }) {
     if (!token) return;
 
     // determine transport and URL
-    const newSocket = io({
+    const newSocket = io(import.meta.env.VITE_API_URL ?? '', {
       transports: ['websocket', 'polling']
     });
 
@@ -1143,7 +1146,7 @@ function MessagesView({ currentUser }: { currentUser: UserData }) {
     setSocket(newSocket);
 
     // 2. Fetch Friends
-    fetch('/api/users/me/friends', {
+    fetch(apiUrl('/api/users/me/friends'), {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -1159,7 +1162,7 @@ function MessagesView({ currentUser }: { currentUser: UserData }) {
     // Re-fetch messages when selected friend changes
     if (selectedFriend) {
       const token = localStorage.getItem('retro_token');
-      fetch(`/api/messages/${selectedFriend._id}`, {
+      fetch(apiUrl(`/api/messages/${selectedFriend._id}`), {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.json())
@@ -1177,7 +1180,7 @@ function MessagesView({ currentUser }: { currentUser: UserData }) {
   };
 
   return (
-    <div className="flex bg-white h-full border-2 border-t-gray-800 border-l-gray-800">
+    <div className="flex bg-white h-full min-h-0 border-2 border-t-gray-800 border-l-gray-800">
       {/* Sidebar for Friends */}
       <div className="w-1/3 border-r-2 border-gray-400 bg-gray-100 flex flex-col">
         <div className="bg-gray-300 px-2 py-1 text-xs font-bold border-b-2 border-gray-400">Buddy List</div>
@@ -1258,7 +1261,7 @@ function SearchView({ user, onViewProfile, onAddFriend }: { user: UserData, onVi
     setHasSearched(true);
     
     try {
-      const res = await fetch(`/api/users/search?keyword=${encodeURIComponent(keywords)}&type=${searchBy}`, {
+      const res = await fetch(apiUrl(`/api/users/search?keyword=${encodeURIComponent(keywords)}&type=${searchBy}`), {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
       });
       if (res.ok) {
@@ -1412,3 +1415,5 @@ function SearchView({ user, onViewProfile, onAddFriend }: { user: UserData, onVi
     </div>
   );
 }
+
+
