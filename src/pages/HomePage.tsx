@@ -91,9 +91,12 @@ export default function HomePage() {
     }).catch(console.error);
   };
 
-  // Poll for new friend requests every 15 seconds
+  // Poll for new friend requests and friends list every 15 seconds
   useEffect(() => {
-    const interval = setInterval(fetchRequests, 15000);
+    const interval = setInterval(() => {
+      fetchRequests();
+      fetchFriends();
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 
