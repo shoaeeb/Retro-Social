@@ -855,7 +855,8 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
 
   if (isEditing && isMe) {
     return (
-      <div className="p-6 max-w-2xl mx-auto">
+      <div className="overflow-y-auto flex-1 min-h-0">
+        <div className="p-6 max-w-2xl mx-auto">
         <div className="window-frame bg-retro-gray p-1 shadow-md">
           <div className="bg-retro-blue text-white text-[10px] font-bold px-2 py-0.5 uppercase">
             Edit Profile.EXE
@@ -920,6 +921,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
               </div>
             </form>
           </div>
+        </div>
         </div>
       </div>
     );
