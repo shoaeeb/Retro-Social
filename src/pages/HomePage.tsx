@@ -638,11 +638,13 @@ function EventsView({ targetUserId, currentUser }: { targetUserId: string | null
 
 function FeedView({ user, onViewProfile }: { user: UserData, onViewProfile: (id: string) => void }) {
   const [posts, setPosts] = useState<any[]>([]);
+  const [hnPosts, setHnPosts] = useState<any[]>([]);
   const [newPostContent, setNewPostContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
 
   useEffect(() => {
     fetchPosts();
+    fetchHNPosts();
   }, []);
 
   const fetchPosts = () => {
@@ -650,15 +652,25 @@ function FeedView({ user, onViewProfile }: { user: UserData, onViewProfile: (id:
       headers: { 'Authorization': `Bearer ${localStorage.getItem('retro_token')}` }
     })
     .then(res => res.json())
-    .then(data => setPosts(data))
+    .then(data => setPosts(Array.isArray(data) ? data : []))
     .catch(console.error);
+  };
+
+  const fetchHNPosts = async () => {
+    try {
+      const articles = await fetch(
+        'https://dev.to/api/articles?per_page=10&top=1'
+      ).then(r => r.json());
+      setHnPosts(Array.isArray(articles) ? articles : []);
+    } catch (err) {
+      console.error('Dev.to fetch failed', err);
+    }
   };
 
   const handlePost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPostContent.trim()) return;
     setIsPosting(true);
-    
     try {
       const res = await fetch(apiUrl('/api/posts'), {
         method: 'POST',
@@ -702,11 +714,12 @@ function FeedView({ user, onViewProfile }: { user: UserData, onViewProfile: (id:
       </div>
       
       <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+        {/* User posts first */}
         {posts.map(post => (
           <div key={post._id} className="bg-retro-gray border-2 border-blue-600 p-1">
             <div className="bg-white border-2 border-t-gray-800 border-l-gray-800 p-2 flex gap-3">
               <div className="w-12 h-12 shrink-0 border border-t-gray-800 border-l-gray-800 bg-gray-200">
-                 <img src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${post.authorName}`} alt="avatar" className="w-full h-full" />
+                <img src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${post.authorName}`} alt="avatar" className="w-full h-full" />
               </div>
               <div className="flex-1 min-w-0 flex flex-col">
                 <div className="mb-1 text-sm">
@@ -720,9 +733,51 @@ function FeedView({ user, onViewProfile }: { user: UserData, onViewProfile: (id:
             </div>
           </div>
         ))}
-        {posts.length === 0 && (
+
+        {/* HN posts as filler when feed is sparse */}
+        {hnPosts.length > 0 && (
+          <>
+            <div className="text-[10px] font-bold uppercase text-gray-400 border-t border-dashed border-gray-300 pt-2 text-center tracking-widest">
+              ★ From Around The Web ★
+            </div>
+            {hnPosts.map(story => (
+              <div key={story.id} className="bg-retro-gray border-2 border-yellow-600 p-1">
+                <div className="bg-white border-2 border-t-gray-800 border-l-gray-800 p-2 flex gap-3">
+                  <div className="w-12 h-12 shrink-0 border border-t-gray-800 border-l-gray-800 bg-purple-100 flex items-center justify-center overflow-hidden">
+                    {story.user?.profile_image_90
+                      ? <img src={story.user.profile_image_90} alt="avatar" className="w-full h-full object-cover" />
+                      : <span className="text-purple-600 font-bold text-lg">D</span>
+                    }
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-purple-700 text-sm">{story.user?.name || story.user?.username}</span>
+                      <span className="text-[9px] bg-purple-100 border border-purple-300 text-purple-600 font-bold px-1 uppercase">DEV</span>
+                    </div>
+                    <a
+                      href={story.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-800 hover:underline font-bold break-words"
+                    >
+                      {story.title}
+                    </a>
+                    {story.description && (
+                      <p className="text-xs text-gray-600 italic line-clamp-2">"{story.description}"</p>
+                    )}
+                    <div className="text-[10px] text-gray-500">
+                      ♥ {story.positive_reactions_count} · 💬 {story.comments_count} comments · {story.reading_time_minutes} min read
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {posts.length === 0 && hnPosts.length === 0 && (
           <div className="text-center text-sm font-bold text-gray-500 py-10">
-            No posts found.
+            Loading feed...
           </div>
         )}
       </div>
