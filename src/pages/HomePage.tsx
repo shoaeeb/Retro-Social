@@ -1142,7 +1142,7 @@ function ProfileView({ user, targetUserId, onUpdate, onAddFriend, onViewProfile,
               <button className="retro-button self-end text-xs uppercase shadow-none ring-1 ring-black">Publish</button>
             </form>
 
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
               {comments.slice(0, 10).map((c, i) => (
                 <div key={c._id || i} className="bg-gray-100 p-2 border border-gray-300 text-sm">
                   <div className="font-bold text-retro-blue text-xs uppercase mb-1">
