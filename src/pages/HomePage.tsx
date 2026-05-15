@@ -182,7 +182,7 @@ export default function HomePage() {
                   <div className="bg-retro-blue text-white text-[10px] font-bold px-2 py-0.5">
                     Me
                   </div>
-                  <div className="bg-white border-2 border-t-gray-800 border-l-gray-800 p-3 h-full">
+                  <div className="bg-white border-2 border-t-gray-800 border-l-gray-800 p-3">
                     <h3 className="font-bold text-sm mb-2">{user?.displayName || user?.name}</h3>
                     <div className="w-full aspect-square bg-gray-200 border-2 border-gray-400 flex items-center justify-center mb-2 overflow-hidden">
                       <img 
@@ -1344,8 +1344,8 @@ function SearchView({ user, onViewProfile, onAddFriend }: { user: UserData, onVi
   };
 
   return (
-    <div className="w-full flex justify-center">
-      <div className="w-full max-w-4xl flex flex-col gap-6">
+    <div className="w-full flex justify-center min-h-0">
+      <div className="w-full max-w-4xl flex flex-col gap-6 pb-6">
         
         {/* Header Text */}
         <div className="flex flex-col mb-2 items-start mt-4">
